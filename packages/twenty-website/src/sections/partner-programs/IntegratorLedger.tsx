@@ -12,13 +12,14 @@ import {
   EASING,
   FONT_WEIGHT,
   fontFamily,
-  fontSize,
   mediaUp,
   radius,
   REDUCED_MOTION,
   semanticColor,
   spacing,
+  typeRampDeclarations,
 } from '@/tokens';
+import { Field } from '@/ui';
 import { cssVariableStyle } from '@/ui/css-variable-style';
 
 import { INTEGRATOR_LEDGER } from './integrator-ledger-config';
@@ -32,10 +33,9 @@ const MONTHS = Array.from(
 );
 const READOUT_ENTRANCE_DELAY_MS = 900;
 
-// Dark glass, the Twenty way: square corners, hairline, one top highlight.
+// Outlined like the level cards above it.
 const Panel = styled.div`
-  background-color: ${color('black')};
-  border: 1px solid ${color('white-10')};
+  border: 1px solid ${semanticColor.line};
   border-radius: ${radius(2)};
   padding: ${spacing(5)};
   position: relative;
@@ -49,7 +49,7 @@ const Panel = styled.div`
     margin-top: ${spacing(6)};
   }
 
-  /* Wide (under the level cards): figures and slider left, chart right. */
+  /* Wide: figures and slider left, chart right. */
   @container (min-width: 880px) {
     align-items: end;
     display: grid;
@@ -68,9 +68,9 @@ const Panel = styled.div`
       align-self: start;
     }
 
-    & > :nth-child(3) {
+    & > :nth-child(2) {
       grid-column: 2;
-      grid-row: 1 / span 4;
+      grid-row: 1 / span 3;
     }
   }
 
@@ -130,59 +130,13 @@ const Stack = styled.div`
   width: 100%;
 `;
 
-const HeaderRow = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-`;
-
-const MonoLabel = styled.span`
-  color: ${semanticColor.inkMuted};
-  font-family: ${fontFamily('mono')};
-  font-size: 11px;
-  font-weight: ${FONT_WEIGHT.medium};
-  letter-spacing: 0.06em;
-  line-height: 16px;
-  text-transform: uppercase;
-
-  &[data-strong] {
-    color: ${semanticColor.ink};
-  }
-`;
-
-const LabelWithMarker = styled.span`
-  align-items: center;
-  display: inline-flex;
-  gap: ${spacing(2)};
-
-  &::before {
-    background-color: ${color('green')};
-    border-radius: 1px;
-    content: '';
-    height: 7px;
-    width: 14px;
-  }
-`;
-
-const Readout = styled.div`
-  & > * + * {
-    margin-top: ${spacing(2)};
-  }
-`;
-
 const ReadoutValue = styled.output`
+  ${typeRampDeclarations('headingLg')}
   color: ${semanticColor.ink};
   display: block;
   font-family: ${fontFamily('serif')};
-  font-size: ${fontSize(14)};
   font-variant-numeric: tabular-nums;
   font-weight: ${FONT_WEIGHT.light};
-  letter-spacing: -0.03em;
-  line-height: 1;
-
-  ${mediaUp('md')} {
-    font-size: ${fontSize(19)};
-  }
 `;
 
 const Chart = styled.div`
@@ -192,7 +146,7 @@ const Chart = styled.div`
 `;
 
 const Columns = styled.div`
-  border-bottom: 1px solid ${color('white-20')};
+  border-bottom: 1px solid ${semanticColor.lineStrong};
   column-gap: ${spacing(1.5)};
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -207,7 +161,7 @@ const Column = styled.span`
   &::before {
     background-image: repeating-linear-gradient(
       to top,
-      ${color('white-10')} 0 2px,
+      ${semanticColor.line} 0 2px,
       transparent 2px ${DASH_PITCH_PX}px
     );
     content: '';
@@ -245,7 +199,7 @@ const ColumnFill = styled.span`
 `;
 
 const ColumnCap = styled.span`
-  background-color: ${color('green')};
+  background-color: ${semanticColor.ink};
   height: 2px;
   left: 0;
   position: absolute;
@@ -265,43 +219,42 @@ const MonthTicks = styled.div`
   grid-template-columns: repeat(12, minmax(0, 1fr));
 
   & > span {
+    ${typeRampDeclarations('bodyXs')}
     color: ${semanticColor.inkSubtle};
-    font-family: ${fontFamily('mono')};
-    font-size: 10px;
-    line-height: 14px;
+    font-family: ${fontFamily('sans')};
     text-align: center;
   }
 `;
 
 const SliderBlock = styled.div`
-  padding-top: ${spacing(5)};
-
   & > * + * {
     margin-top: ${spacing(3)};
   }
 `;
 
+// The Field label recipe, on a <label> so it targets the slider.
 const SliderHeader = styled.label`
+  ${typeRampDeclarations('bodyXs')}
   align-items: baseline;
+  color: ${semanticColor.ink};
   display: flex;
+  font-family: ${fontFamily('sans')};
+  font-weight: ${FONT_WEIGHT.medium};
   justify-content: space-between;
 `;
 
 const SeatValue = styled.span`
-  color: ${semanticColor.ink};
-  font-family: ${fontFamily('sans')};
-  font-size: ${fontSize(5)};
+  ${typeRampDeclarations('headingXs')}
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1;
+  font-weight: ${FONT_WEIGHT.regular};
 `;
 
 const Slider = styled.input`
   appearance: none;
   background: linear-gradient(
       to right,
-      ${color('white')} var(--progress),
-      ${color('white-20')} var(--progress)
+      ${semanticColor.ink} var(--progress),
+      ${semanticColor.line} var(--progress)
     )
     center / 100% 2px no-repeat;
   cursor: pointer;
@@ -311,27 +264,27 @@ const Slider = styled.input`
 
   &::-webkit-slider-thumb {
     appearance: none;
-    background-color: ${color('white')};
+    background-color: ${semanticColor.ink};
     border: none;
     border-radius: ${radius(1)};
-    box-shadow: 0 0 0 4px ${color('white-10')};
+    box-shadow: 0 0 0 4px ${semanticColor.line};
     height: 16px;
     transition: box-shadow ${DURATION.xxs} ${EASING.gentle};
     width: 16px;
   }
 
   &::-moz-range-thumb {
-    background-color: ${color('white')};
+    background-color: ${semanticColor.ink};
     border: none;
     border-radius: ${radius(1)};
-    box-shadow: 0 0 0 4px ${color('white-10')};
+    box-shadow: 0 0 0 4px ${semanticColor.line};
     height: 16px;
     width: 16px;
   }
 
   &:hover::-webkit-slider-thumb,
   &:active::-webkit-slider-thumb {
-    box-shadow: 0 0 0 7px ${color('white-20')};
+    box-shadow: 0 0 0 7px ${semanticColor.line};
   }
 
   &:focus-visible {
@@ -340,19 +293,10 @@ const Slider = styled.input`
   }
 `;
 
-const Footer = styled.div`
-  padding-top: ${spacing(4)};
-
-  & > * + * {
-    margin-top: ${spacing(1.5)};
-  }
-`;
-
 const Footnote = styled.p`
+  ${typeRampDeclarations('bodyXs')}
   color: ${semanticColor.inkSubtle};
   font-family: ${fontFamily('sans')};
-  font-size: ${fontSize(3)};
-  line-height: 1.5;
 `;
 
 const filledDashFraction = (month: number, seats: number): number => {
@@ -372,7 +316,7 @@ type IntegratorLedgerProps = {
   footnote: string;
 };
 
-// The hero object. Seats in, twelve months of commission out.
+// Seats in, twelve months of commission out.
 export function IntegratorLedger({ footnote }: IntegratorLedgerProps) {
   const { i18n } = useLingui();
   const [seats, setSeats] = useState(INTEGRATOR_LEDGER.defaultSeats);
@@ -408,18 +352,17 @@ export function IntegratorLedger({ footnote }: IntegratorLedgerProps) {
   return (
     <Stack>
       <Panel>
-        <HeaderRow style={cssVariableStyle({ '--row': 0 })}>
-          <MonoLabel data-strong="">
-            <LabelWithMarker>{i18n._(msg`Your commission`)}</LabelWithMarker>
-          </MonoLabel>
-        </HeaderRow>
-        <Readout style={cssVariableStyle({ '--row': 1 })}>
-          <ReadoutValue aria-live="polite" htmlFor="integrator-ledger-seats">
-            {currency.format(shownCommission)}
-          </ReadoutValue>
-          <MonoLabel>{i18n._(msg`Estimate, over 12 months`)}</MonoLabel>
-        </Readout>
-        <Chart aria-hidden style={cssVariableStyle({ '--row': 2 })}>
+        <div style={cssVariableStyle({ '--row': 0 })}>
+          <Field
+            hint={i18n._(msg`Estimate, over 12 months`)}
+            label={i18n._(msg`Your commission`)}
+          >
+            <ReadoutValue aria-live="polite" htmlFor="integrator-ledger-seats">
+              {currency.format(shownCommission)}
+            </ReadoutValue>
+          </Field>
+        </div>
+        <Chart aria-hidden style={cssVariableStyle({ '--row': 1 })}>
           <Columns>
             {MONTHS.map((month) => (
               <Column
@@ -442,9 +385,9 @@ export function IntegratorLedger({ footnote }: IntegratorLedgerProps) {
             ))}
           </MonthTicks>
         </Chart>
-        <SliderBlock style={cssVariableStyle({ '--row': 3 })}>
+        <SliderBlock style={cssVariableStyle({ '--row': 2 })}>
           <SliderHeader htmlFor="integrator-ledger-seats">
-            <MonoLabel>{i18n._(msg`Seats you bring`)}</MonoLabel>
+            {i18n._(msg`Seats you bring`)}
             <SeatValue>{seats}</SeatValue>
           </SliderHeader>
           <Slider
@@ -458,14 +401,12 @@ export function IntegratorLedger({ footnote }: IntegratorLedgerProps) {
             value={seats}
           />
         </SliderBlock>
-        <Footer style={cssVariableStyle({ '--row': 4 })}>
-          <Footnote>
-            {i18n._(
-              msg`Estimate on the Organization plan at $${seatPricePerMonth} per seat per month, billed yearly.`,
-            )}{' '}
-            {footnote}
-          </Footnote>
-        </Footer>
+        <Footnote style={cssVariableStyle({ '--row': 3 })}>
+          {i18n._(
+            msg`Estimate on the Organization plan at $${seatPricePerMonth} per seat per month, billed yearly.`,
+          )}{' '}
+          {footnote}
+        </Footnote>
       </Panel>
     </Stack>
   );

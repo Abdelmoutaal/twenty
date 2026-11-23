@@ -8,9 +8,9 @@ import {
   type MarketplaceApp,
   type MarketplaceAppDetail,
 } from '@/apps-marketplace';
-import { AppsStageAppDetail } from '@/apps-marketplace/AppsStageAppDetail';
-import { AppsStageCraftCatalogue } from '@/apps-marketplace/AppsStageCraftCatalogue';
-import { AppsStageCraftHero } from '@/apps-marketplace/AppsStageCraftHero';
+import { AppDetail } from '@/apps-marketplace/AppDetail';
+import { AppsCatalogue } from '@/apps-marketplace/AppsCatalogue';
+import { AppsHero } from '@/apps-marketplace/AppsHero';
 import { getCommunityStats } from '@/platform/community';
 import { getRouteI18n } from '@/platform/i18n/get-route-i18n';
 import { getServerI18n } from '@/platform/i18n/get-server-i18n';
@@ -77,8 +77,8 @@ export default async function AppDetailPage({
       <>
         <Menu communityStats={communityStats} scheme="dark" />
         <main>
-          <AppsStageCraftHero apps={[]} />
-          <AppsStageCraftCatalogue apps={[]} isUnavailable />
+          <AppsHero apps={[]} />
+          <AppsCatalogue apps={[]} isUnavailable />
         </main>
       </>
     );
@@ -100,9 +100,9 @@ export default async function AppDetailPage({
           locale,
         )}
       />
-      <Menu communityStats={communityStats} scheme="dark" />
+      <Menu communityStats={communityStats} scheme="light" />
       <main>
-        <AppsStageAppDetail app={app} apps={apps} locale={locale} />
+        <AppDetail app={app} apps={apps} locale={locale} />
       </main>
     </>
   );

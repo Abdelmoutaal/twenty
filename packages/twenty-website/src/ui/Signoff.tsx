@@ -51,7 +51,6 @@ const Actions = styled.div`
 `;
 
 export type SignoffProps = {
-  backdrop?: ReactNode;
   body: string;
   children: ReactNode;
   crosshairSide?: SignoffCrosshairSide;
@@ -60,7 +59,6 @@ export type SignoffProps = {
 };
 
 export function Signoff({
-  backdrop,
   body,
   children,
   crosshairSide = 'right',
@@ -70,13 +68,10 @@ export function Signoff({
   return (
     <SectionShell
       background={
-        <>
-          {backdrop}
-          <GuideCrosshair
-            crossX={SIGNOFF_CROSSHAIR_X[crosshairSide]}
-            crossY={SIGNOFF_CROSSHAIR_Y}
-          />
-        </>
+        <GuideCrosshair
+          crossX={SIGNOFF_CROSSHAIR_X[crosshairSide]}
+          crossY={SIGNOFF_CROSSHAIR_Y}
+        />
       }
       rhythm="flush"
       scheme={scheme}

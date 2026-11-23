@@ -1,119 +1,104 @@
 import { type MessageDescriptor } from '@lingui/core';
-import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { type ReactNode } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 
 import { getServerI18n } from '@/platform/i18n/get-server-i18n';
-import { fontSize, mediaUp, REDUCED_MOTION, spacing } from '@/tokens';
-import { Body, Eyebrow, Heading, SectionShell } from '@/ui';
+import { GRADIENT, HERO_COMPOSITION, spacing } from '@/tokens';
+import { APP_PREVIEW_STAGE } from '@/tokens/app-preview/app-preview-stage';
+import { Body, Heading, HeadingPair, SectionShell } from '@/ui';
 
-// The copy dissolves as it scrolls under the menu, over the first 420px.
-const Intro = styled.div`
-  animation-duration: auto;
-  animation-fill-mode: both;
-  animation-name: program-hero-dissolve;
-  animation-range: 0 420px;
-  animation-timeline: scroll(root);
-  animation-timing-function: linear;
+// WhyTwentyHero's composition: centered intro, actions, then the visual.
+const IntroStack = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  margin-inline: auto;
-  max-width: 760px;
   text-align: center;
+  width: 100%;
 
   & > * + * {
-    margin-top: ${spacing(5)};
-  }
-
-  @keyframes program-hero-dissolve {
-    to {
-      filter: blur(8px);
-      opacity: 0;
-      transform: translate3d(0, -40px, 0);
-    }
-  }
-
-  ${REDUCED_MOTION} {
-    animation: none;
+    margin-top: ${spacing(8)};
   }
 `;
 
-const heroTitleClassName = css`
-  ${mediaUp('lg')} {
-    &[data-size][data-family] {
-      font-size: ${fontSize(20)};
-      line-height: ${fontSize(21.5)};
-    }
-  }
+// HomeHero's app-window height for every program hero, so integrators and
+// creators match whether they show an object or a full-bleed backdrop.
+const VisualStage = styled.div`
+  height: ${APP_PREVIEW_STAGE.windowScene.heightPx}px;
+  margin-top: ${HERO_COMPOSITION.ctaToVisualGapPx}px;
+  width: 100%;
 `;
 
-// The photo is behind; the copy alone holds the first screen.
-const PhotoStage = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  min-height: 420px;
+const GradientBackdrop = styled.div`
+  background: ${GRADIENT.heroGlow};
+  inset: 0 -20%;
+  position: absolute;
+`;
 
-  ${mediaUp('md')} {
-    min-height: 620px;
-  }
+const HeadingMeasure = styled.div`
+  max-width: 672px;
+  width: 100%;
 `;
 
 const BodyMeasure = styled.div`
-  max-width: 480px;
+  margin-inline: auto;
+  max-width: 443px;
 `;
 
-const Actions = styled.div`
-  align-items: center;
+const CtaRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${spacing(3)};
   justify-content: center;
-  padding-top: ${spacing(3)};
 `;
 
 type ProgramHeroProps = {
-  eyebrow: MessageDescriptor;
   heading: MessageDescriptor;
   body: MessageDescriptor;
   actions: ReactNode;
-  backdrop: ReactNode;
+  backdrop?: ReactNode;
+  visual?: ReactNode;
 };
 
 export function ProgramHero({
-  eyebrow,
   heading,
   body,
   actions,
   backdrop,
+  visual,
 }: ProgramHeroProps) {
   const i18n = getServerI18n();
 
   return (
     <SectionShell
-      background={backdrop}
+      background={
+        isDefined(backdrop) ? (
+          <>
+            <GradientBackdrop />
+            {backdrop}
+          </>
+        ) : undefined
+      }
       fullBleedBackground
       rhythm="hero"
-      scheme="dark"
+      scheme="muted"
     >
-      <PhotoStage>
-        <Intro data-halftone-exclude="">
-          <Eyebrow>{i18n._(eyebrow)}</Eyebrow>
-          <Heading
-            as="h1"
-            className={heroTitleClassName}
-            size="lg"
-            weight="light"
-          >
-            {i18n._(heading)}
-          </Heading>
+      <IntroStack data-halftone-exclude="">
+        <HeadingPair>
+          <HeadingMeasure>
+            <Heading as="h1" size="lg" weight="light">
+              {i18n._(heading)}
+            </Heading>
+          </HeadingMeasure>
           <BodyMeasure>
-            <Body muted>{i18n._(body)}</Body>
+            <Body muted size="sm">
+              {i18n._(body)}
+            </Body>
           </BodyMeasure>
-          <Actions>{actions}</Actions>
-        </Intro>
-      </PhotoStage>
+        </HeadingPair>
+        <CtaRow>{actions}</CtaRow>
+      </IntroStack>
+      <VisualStage>{visual}</VisualStage>
     </SectionShell>
   );
 }

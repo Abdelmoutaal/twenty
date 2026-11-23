@@ -1,9 +1,8 @@
 import { msg } from '@lingui/core/macro';
 
 import { fetchMarketplaceApps } from '@/apps-marketplace';
-import { AppsStageCraftCatalogue } from '@/apps-marketplace/AppsStageCraftCatalogue';
-import { AppsStageCraftHero } from '@/apps-marketplace/AppsStageCraftHero';
-import { AppsStageFeatured } from '@/apps-marketplace/AppsStageFeatured';
+import { AppsCatalogue } from '@/apps-marketplace/AppsCatalogue';
+import { AppsHero } from '@/apps-marketplace/AppsHero';
 import { getCommunityStats } from '@/platform/community';
 import {
   getRouteI18n,
@@ -17,7 +16,7 @@ import {
   JsonLd,
 } from '@/platform/seo';
 import { SITE_URLS } from '@/platform/site-urls';
-import { FaqBackdrop } from '@/sections/faq/FaqBackdrop';
+import { Faq } from '@/sections/faq';
 import { Menu } from '@/sections/menu';
 import { Button, Signoff } from '@/ui';
 
@@ -53,21 +52,16 @@ export default async function AppsMarketplacePage({
           locale,
         )}
       />
-      <Menu communityStats={communityStats} scheme="dark" />
+      <Menu communityStats={communityStats} scheme="muted" />
       <main>
-        <AppsStageCraftHero apps={apps ?? []} />
-        <AppsStageFeatured apps={apps ?? []} />
-        <AppsStageCraftCatalogue
-          apps={apps ?? []}
-          isUnavailable={apps === null}
-        />
+        <AppsHero apps={apps ?? []} />
+        <AppsCatalogue apps={apps ?? []} isUnavailable={apps === null} />
         <Signoff
-          backdrop={<FaqBackdrop />}
           body={i18n._(
             msg`Add objects, logic and interface to Twenty, then publish it for every workspace.`,
           )}
           heading={i18n._(msg`Build your own *app*`)}
-          scheme="dark"
+          scheme="muted"
         >
           <Button
             href={SITE_URLS.docsDevelopers}
@@ -75,6 +69,7 @@ export default async function AppsMarketplacePage({
             variant="filled"
           />
         </Signoff>
+        <Faq />
       </main>
     </>
   );

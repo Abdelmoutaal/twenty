@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro';
 
+import { TalkToUsButton } from '@/contact-cal';
 import { PartnerApplicationModalRoot } from '@/partner-application';
 import { getCommunityStats } from '@/platform/community';
 import {
@@ -14,17 +15,16 @@ import {
   JsonLd,
 } from '@/platform/seo';
 import { BecomePartnerFaq } from '@/sections/faq';
+import { HeroBackdrop } from '@/sections/home-hero';
 import { Menu } from '@/sections/menu';
+import { ProductStepper } from '@/sections/product-stepper';
 import {
-  INTEGRATOR_DOCK_MODEL,
-  INTEGRATOR_STEPS,
+  INTEGRATOR_STEPPER_STEPS,
   IntegratorApplyButton,
+  IntegratorEarnings,
   IntegratorLevelCards,
   PARTNER_LEVELS,
-  ProgramApplyDock,
   ProgramHero,
-  ProgramHeroBackdrop,
-  ProgramPath,
 } from '@/sections/partner-programs';
 import { PartnerTestimonials } from '@/sections/testimonials';
 import { Button } from '@/ui';
@@ -57,7 +57,7 @@ export default async function IntegratorProgramPage({
           locale,
         )}
       />
-      <Menu communityStats={communityStats} scheme="dark" />
+      <Menu communityStats={communityStats} scheme="muted" />
       <main>
         <ProgramHero
           actions={
@@ -71,34 +71,30 @@ export default async function IntegratorProgramPage({
             </>
           }
           backdrop={
-            <ProgramHeroBackdrop
-              imageUrl="/images/partners/hero/partners-hero.webp"
-              isPriority
-            />
+            <HeroBackdrop imageUrl="/images/partners/hero/partners-hero-soft.webp" />
           }
           body={msg`Implement Twenty for your clients. Earn 20% on every client you bring, every month for a year.`}
-          eyebrow={msg`Partners`}
           heading={msg`Become a\n*Twenty integrator*`}
         />
-        <IntegratorLevelCards
-          ledgerFootnote={msg`Commission on Organization and Enterprise plans`}
-          levels={PARTNER_LEVELS}
-        />
-        <ProgramPath
+        <IntegratorLevelCards levels={PARTNER_LEVELS} />
+        <IntegratorEarnings />
+        <ProductStepper
           anchorId={HOW_IT_WORKS_ANCHOR_ID}
-          backdropLoading="eager"
           body={msg`Three steps, and no fee to join. You set your own rates and keep what you bill.`}
           eyebrow={msg`How it works`}
           heading={msg`From application *to clients*`}
-          steps={INTEGRATOR_STEPS}
+          steps={INTEGRATOR_STEPPER_STEPS}
         />
         <PartnerTestimonials />
-        <BecomePartnerFaq />
+        <BecomePartnerFaq
+          actions={
+            <>
+              <IntegratorApplyButton />
+              <TalkToUsButton label={msg`Talk to us`} variant="outlined" />
+            </>
+          }
+        />
       </main>
-      <ProgramApplyDock
-        action={<IntegratorApplyButton isDocked />}
-        model={INTEGRATOR_DOCK_MODEL}
-      />
     </PartnerApplicationModalRoot>
   );
 }

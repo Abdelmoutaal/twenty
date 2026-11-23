@@ -1,6 +1,7 @@
 import { msg } from '@lingui/core/macro';
 
 import { AffiliateApplicationModalRoot } from '@/affiliate-application';
+import { TalkToUsButton } from '@/contact-cal';
 import { getCommunityStats } from '@/platform/community';
 import {
   getRouteI18n,
@@ -15,16 +16,14 @@ import {
 } from '@/platform/seo';
 import { AffiliateProgramFaq } from '@/sections/faq';
 import { Menu } from '@/sections/menu';
+import { ProductStepper } from '@/sections/product-stepper';
 import {
-  CREATOR_STEPS,
-  CREATOR_DOCK_MODEL,
+  CREATOR_STEPPER_STEPS,
   CreatorApplyButton,
   CreatorAudiences,
-  CreatorTermsCard,
-  ProgramApplyDock,
+  CREATOR_HERO_MODEL,
   ProgramHero,
-  ProgramHeroBackdrop,
-  ProgramPath,
+  ProgramHeroVisual,
 } from '@/sections/partner-programs';
 import { Button } from '@/ui';
 
@@ -56,7 +55,7 @@ export default async function CreatorProgramPage({
           locale,
         )}
       />
-      <Menu communityStats={communityStats} scheme="dark" />
+      <Menu communityStats={communityStats} scheme="muted" />
       <main>
         <ProgramHero
           actions={
@@ -69,31 +68,29 @@ export default async function CreatorProgramPage({
               />
             </>
           }
-          backdrop={
-            <ProgramHeroBackdrop
-              imageUrl="/images/partners/hero/creators-hero.webp"
-              isFaint
-            />
+          visual={
+            <ProgramHeroVisual model={CREATOR_HERO_MODEL} slot="creator-hero" />
           }
           body={msg`Create content or run a community. Earn 20% on every team you bring to Twenty, every month for a year.`}
-          eyebrow={msg`Partners`}
           heading={msg`Become a\n*Twenty creator*`}
         />
-        <CreatorTermsCard />
         <CreatorAudiences />
-        <ProgramPath
+        <ProductStepper
           anchorId={HOW_IT_WORKS_ANCHOR_ID}
           body={msg`Share your link, we credit the signups it brings, and you get paid every month the customer stays, for up to 12 months.`}
           eyebrow={msg`How it works`}
           heading={msg`From link *to payout*`}
-          steps={CREATOR_STEPS}
+          steps={CREATOR_STEPPER_STEPS}
         />
-        <AffiliateProgramFaq />
+        <AffiliateProgramFaq
+          actions={
+            <>
+              <CreatorApplyButton />
+              <TalkToUsButton label={msg`Talk to us`} variant="outlined" />
+            </>
+          }
+        />
       </main>
-      <ProgramApplyDock
-        action={<CreatorApplyButton isDocked />}
-        model={CREATOR_DOCK_MODEL}
-      />
     </AffiliateApplicationModalRoot>
   );
 }

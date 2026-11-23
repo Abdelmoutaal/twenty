@@ -1,6 +1,7 @@
 import { msg } from '@lingui/core/macro';
 
 import { ClientBriefModalRoot, GetMatchedButton } from '@/client-brief';
+import { TalkToUsButton } from '@/contact-cal';
 import { getCommunityStats } from '@/platform/community';
 import {
   getRouteI18n,
@@ -12,16 +13,16 @@ import {
   buildRouteMetadata,
   JsonLd,
 } from '@/platform/seo';
-import { FaqBackdrop } from '@/sections/faq/FaqBackdrop';
+import { PartnerFaq } from '@/sections/faq';
 import { Menu } from '@/sections/menu';
 import { BrowseDirectoryButton } from '@/sections/partner-hero/BrowseDirectoryButton';
 import {
   loadDirectoryPartners,
-  PartnersStageCraftClosing,
-  PartnersStageCraftDirectory,
-  PartnersStageCraftMapHero,
-  PartnersStageCraftServices,
-} from '@/sections/partners-stage';
+  PartnersClosing,
+  PartnersDirectory,
+  PartnersHero,
+  PartnersServices,
+} from '@/sections/partners-directory';
 
 export const generateMetadata = buildRouteMetadata('partners');
 
@@ -52,25 +53,31 @@ export default async function PartnersPage({
       />
       <Menu communityStats={communityStats} scheme="dark" />
       <main>
-        <PartnersStageCraftMapHero
+        <PartnersHero
           actions={
             <>
               <BrowseDirectoryButton />
               <GetMatchedButton label={msg`Get matched`} variant="outlined" />
             </>
           }
-          partners={partners}
         />
-        <PartnersStageCraftServices />
-        <PartnersStageCraftDirectory
+        <PartnersServices />
+        <PartnersDirectory
           matchCta={
             <GetMatchedButton label={msg`Get matched`} variant="filled" />
           }
           partners={partners}
         />
-        <PartnersStageCraftClosing
+        <PartnersClosing
           action={<GetMatchedButton label={msg`Submit a brief`} />}
-          backdrop={<FaqBackdrop />}
+        />
+        <PartnerFaq
+          actions={
+            <>
+              <GetMatchedButton label={msg`Get matched`} />
+              <TalkToUsButton label={msg`Talk to us`} variant="outlined" />
+            </>
+          }
         />
       </main>
     </ClientBriefModalRoot>

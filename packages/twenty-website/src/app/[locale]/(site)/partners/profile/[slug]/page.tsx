@@ -13,8 +13,8 @@ import { Menu } from '@/sections/menu';
 import {
   loadDirectoryPartner,
   loadDirectoryPartners,
-  PartnersStagePartnerDetail,
-} from '@/sections/partners-stage';
+  PartnerDetail,
+} from '@/sections/partners-directory';
 
 type PartnerProfileParams = { locale: string; slug: string };
 
@@ -69,10 +69,10 @@ export default async function PartnerProfilePage({
           locale,
         )}
       />
-      <Menu communityStats={communityStats} scheme="dark" />
+      <Menu communityStats={communityStats} scheme="light" />
       <ClientBriefModalRoot>
         <main aria-label={partner.name}>
-          <PartnersStagePartnerDetail
+          <PartnerDetail
             matchCta={
               <GetMatchedButton
                 label={msg`Get matched`}
