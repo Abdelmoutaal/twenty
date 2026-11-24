@@ -48,8 +48,10 @@ export const applyOwnerScope = ({
     return;
   }
 
+  // Quoted explicitly: update/delete builders do not quote alias.property, and
+  // Postgres would otherwise lowercase the camelCase column name
   queryBuilder.andWhere(
-    `${queryBuilder.alias}.${ownerColumn} = :ownerScopeWorkspaceMemberId`,
+    `"${queryBuilder.alias}"."${ownerColumn}" = :ownerScopeWorkspaceMemberId`,
     { ownerScopeWorkspaceMemberId: authContext.workspaceMemberId },
   );
 };

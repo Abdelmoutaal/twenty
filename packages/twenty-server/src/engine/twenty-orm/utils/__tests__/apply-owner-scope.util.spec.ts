@@ -73,7 +73,7 @@ describe('applyOwnerScope', () => {
       const queryBuilder = runApplyOwnerScope({ nameSingular });
 
       expect(queryBuilder.andWhere).toHaveBeenCalledWith(
-        `record.${ownerColumn} = :ownerScopeWorkspaceMemberId`,
+        `"record"."${ownerColumn}" = :ownerScopeWorkspaceMemberId`,
         { ownerScopeWorkspaceMemberId: WORKSPACE_MEMBER_ID },
       );
     },
