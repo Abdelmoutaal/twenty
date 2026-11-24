@@ -5,7 +5,8 @@ import { useCallback, useMemo } from 'react';
 
 // A FilterBar's selection, kept in the URL (?regions=EUROPE,LATAM): one
 // comma-joined, sorted param per facet, as the partners directory already
-// wrote it, so a filtered list is shareable and Back undoes a filter. Only
+// wrote it, so a filtered list is shareable. Changes replace the history
+// entry: Back leaves the page rather than stepping through filters. Only
 // values a facet allows are read, so a stale link can't inject one.
 
 type FacetValues = Record<string, readonly string[]>;

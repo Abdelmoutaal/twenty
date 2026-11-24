@@ -1,10 +1,11 @@
 'use client';
 
 import { styled } from '@linaria/react';
-import { type CSSProperties, useMemo } from 'react';
+import { useMemo } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
 import { color, radius, semanticColor } from '@/tokens';
+import { cssVariableStyle } from '@/ui/css-variable-style';
 
 import { type MarketplaceApp } from './marketplace-app';
 import { useAppLogoInks } from './use-app-logo-inks';
@@ -38,13 +39,7 @@ const Logo = styled.img`
     object-fit: cover;
     width: 100%;
   }
-
-  [data-kind='unknown'] > & {
-    opacity: 0;
-  }
 `;
-
-type TileStyle = CSSProperties & { '--apps-icon-size': string };
 
 type AppIconProps = {
   app: MarketplaceApp;
@@ -55,7 +50,7 @@ export function AppIcon({ app, sizePx }: AppIconProps) {
   // A stable list: a fresh array each render would re-run the read forever.
   const apps = useMemo(() => [app], [app]);
   const inks = useAppLogoInks(apps);
-  const style: TileStyle = { '--apps-icon-size': `${sizePx}px` };
+  const style = cssVariableStyle({ '--apps-icon-size': `${sizePx}px` });
 
   return (
     <Tile

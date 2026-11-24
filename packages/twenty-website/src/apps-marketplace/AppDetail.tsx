@@ -1,6 +1,6 @@
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isNonEmptyString } from 'twenty-shared/utils';
 
 import { ArrowUpRight } from '@/icons';
 import { getServerI18n } from '@/platform/i18n/get-server-i18n';
@@ -169,7 +169,7 @@ const Side = styled.aside`
 
   ${mediaUp('md')} {
     position: sticky;
-    top: ${MENU_HEIGHT_PX + 32}px;
+    top: calc(${MENU_HEIGHT_PX}px + ${spacing(8)});
   }
 `;
 
@@ -264,16 +264,12 @@ const dropRepeatedLede = (markdown: string, tagline: string) => {
     : markdown;
 };
 
-const counted = (count: number, one: string, many: string) =>
-  count === 0 ? [] : [count === 1 ? one : many];
-
 type AppDetailProps = {
   app: MarketplaceAppDetail;
   apps: readonly MarketplaceApp[];
-  locale: string;
 };
 
-export function AppDetail({ app, apps, locale }: AppDetailProps) {
+export function AppDetail({ app, apps }: AppDetailProps) {
   const i18n = getServerI18n();
   const { content } = app;
   const isBeta = BETA_APP_NAMES.includes(app.name.trim().toLowerCase());
@@ -282,13 +278,11 @@ export function AppDetail({ app, apps, locale }: AppDetailProps) {
     ...others.filter((candidate) => candidate.category === app.category),
     ...others.filter((candidate) => candidate.category !== app.category),
   ].slice(0, RELATED_COUNT);
-  const installs = isDefined(app.installCount)
-    ? new Intl.NumberFormat(locale).format(app.installCount)
-    : undefined;
+  const installCount = app.installCount ?? 0;
 
   const overview = (
     <>
-      {isDefined(app.aboutDescription) ? (
+      {isNonEmptyString(app.aboutDescription?.trim()) ? (
         <AppStory
           markdown={dropRepeatedLede(app.aboutDescription, app.tagline)}
         />
@@ -311,11 +305,13 @@ export function AppDetail({ app, apps, locale }: AppDetailProps) {
       title: i18n._(msg`Data`),
       lines: [
         ...names(content.objects),
-        ...counted(
-          fieldCount,
-          i18n._(msg`1 field`),
-          i18n._(msg`${fieldCount} fields`),
-        ),
+        ...(fieldCount === 0
+          ? []
+          : [
+              i18n._(
+                msg`${plural(fieldCount, { one: '# field', other: '# fields' })}`,
+              ),
+            ]),
       ],
     },
     {
@@ -334,11 +330,13 @@ export function AppDetail({ app, apps, locale }: AppDetailProps) {
         ...names(content.agents),
         ...names(content.skills),
         ...names(content.workflows),
-        ...counted(
-          functionCount,
-          i18n._(msg`1 function`),
-          i18n._(msg`${functionCount} functions`),
-        ),
+        ...(functionCount === 0
+          ? []
+          : [
+              i18n._(
+                msg`${plural(functionCount, { one: '# function', other: '# functions' })}`,
+              ),
+            ]),
       ],
     },
     {
@@ -403,9 +401,13 @@ export function AppDetail({ app, apps, locale }: AppDetailProps) {
                     <Body size="sm">{app.latestAvailableVersion}</Body>
                   </Field>
                 )}
-                {isDefined(installs) && (
+                {installCount > 0 && (
                   <Field label={i18n._(msg`Installed by`)}>
-                    <Body size="sm">{i18n._(msg`${installs} workspaces`)}</Body>
+                    <Body size="sm">
+                      {i18n._(
+                        msg`${plural(installCount, { one: '# workspace', other: '# workspaces' })}`,
+                      )}
+                    </Body>
                   </Field>
                 )}
                 {isDefined(app.sourcePackage) && (

@@ -39,7 +39,8 @@ export const worldRegionOfCell = (
   if (longitude < 63 && latitude >= 15 && latitude < 42) {
     return 'MENA';
   }
-  if (longitude < 55 && latitude < 15) {
+  // Up to 65°E south of the equator, so Mauritius and Réunion stay African.
+  if (latitude < 15 && (longitude < 55 || (latitude < 0 && longitude < 65))) {
     return 'AFRICA';
   }
   return 'APAC';

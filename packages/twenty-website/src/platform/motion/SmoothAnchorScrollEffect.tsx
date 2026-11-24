@@ -38,7 +38,11 @@ export function SmoothAnchorScrollEffect() {
         behavior: getReducedMotionSnapshot() ? 'auto' : 'smooth',
         block: 'start',
       });
-      window.history.pushState(null, '', `#${hash}`);
+      // preventDefault also cancels the focus move a native jump makes.
+      target.focus({ preventScroll: true });
+      if (window.location.hash !== `#${hash}`) {
+        window.history.pushState(null, '', `#${hash}`);
+      }
     };
 
     document.addEventListener('click', handleClick);

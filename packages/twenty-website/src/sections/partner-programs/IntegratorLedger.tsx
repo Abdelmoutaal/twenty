@@ -130,6 +130,17 @@ const Stack = styled.div`
   width: 100%;
 `;
 
+// The animated figure counts frame by frame; screen readers hear the settled
+// value from this region instead (same hiding as SalesfarceWindow's checkbox).
+const ReadoutAnnouncement = styled.span`
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+`;
+
 const ReadoutValue = styled.output`
   ${typeRampDeclarations('headingLg')}
   color: ${semanticColor.ink};
@@ -357,9 +368,16 @@ export function IntegratorLedger({ footnote }: IntegratorLedgerProps) {
             hint={i18n._(msg`Estimate, over 12 months`)}
             label={i18n._(msg`Your commission`)}
           >
-            <ReadoutValue aria-live="polite" htmlFor="integrator-ledger-seats">
+            <ReadoutValue
+              aria-hidden
+              aria-live="off"
+              htmlFor="integrator-ledger-seats"
+            >
               {currency.format(shownCommission)}
             </ReadoutValue>
+            <ReadoutAnnouncement aria-live="polite">
+              {currency.format(commission)}
+            </ReadoutAnnouncement>
           </Field>
         </div>
         <Chart aria-hidden style={cssVariableStyle({ '--row': 1 })}>

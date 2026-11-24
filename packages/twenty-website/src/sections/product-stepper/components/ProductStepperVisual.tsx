@@ -81,7 +81,7 @@ export function ProductStepperVisual({
     <VisualColumn>
       <VisualMeasure>
         <ProductStepperVisualFrame>
-          {steps.map(({ heading, Visual }, stepNumber) => {
+          {steps.map(({ heading, scrubbed, Visual }, stepNumber) => {
             const isActive = stepNumber === activeStepIndex;
 
             return (
@@ -90,7 +90,7 @@ export function ProductStepperVisual({
                   <Visual
                     active={isActive}
                     progress={
-                      localProgress === undefined
+                      scrubbed !== true || localProgress === undefined
                         ? undefined
                         : getStepProgress(
                             stepNumber,

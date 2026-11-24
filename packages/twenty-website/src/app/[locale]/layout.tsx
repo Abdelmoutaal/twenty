@@ -13,7 +13,7 @@ import { SmoothAnchorScrollEffect } from '@/platform/motion';
 import { I18nProvider } from '@/platform/i18n/I18nProvider';
 import { resolveLocaleParam } from '@/platform/i18n/resolve-locale-param';
 import { WEBSITE_LOCALE_LIST } from '@/platform/i18n/website-locale-list';
-import { color, fontFamily, tokenCssVariables, MENU_HEIGHT_PX } from '@/tokens';
+import { color, fontFamily, tokenCssVariables } from '@/tokens';
 
 const hostGrotesk = localFont({
   src: '../../fonts/host-grotesk-latin-variable.woff2',
@@ -86,10 +86,6 @@ const globalStyles = css`
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-  }
-
-  :global(html) {
-    scroll-padding-top: ${MENU_HEIGHT_PX}px;
   }
 
   :global(body) {

@@ -16,7 +16,13 @@ import { SERVED_GEOS } from '@/partners-marketplace/served-geos';
 import { SPOKEN_LANGUAGE_LABELS } from '@/partners-marketplace/spoken-language-labels';
 import { SPOKEN_LANGUAGES } from '@/partners-marketplace/spoken-languages';
 import { PARTNER_DIRECTORY_ANCHOR_ID } from '@/platform/routing/partner-directory-anchor-id';
-import { mediaUp, radius, semanticColor, spacing } from '@/tokens';
+import {
+  MENU_HEIGHT_PX,
+  mediaUp,
+  radius,
+  semanticColor,
+  spacing,
+} from '@/tokens';
 import {
   Body,
   Eyebrow,
@@ -34,6 +40,7 @@ import { PartnerCard } from './PartnerCard';
 
 const Header = styled.div`
   max-width: 640px;
+  scroll-margin-top: ${MENU_HEIGHT_PX}px;
 `;
 
 // Three cards side by side from md, with the /apps cards' spacing.

@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { getAppSlug } from './get-app-slug';
 import { marketplaceGraphqlRequest } from './marketplace-api-fetch';
 import { type MarketplaceApp } from './marketplace-app';
@@ -42,17 +44,18 @@ const normalizeApp = (apiApp: ApiMarketplaceApp): MarketplaceApp => ({
 });
 
 // Throws when the marketplace API is unreachable or shapeless: an outage must
-// not read as an empty catalog, or every app page turns into a 404.
-export async function fetchMarketplaceApps(): Promise<
-  readonly MarketplaceApp[]
-> {
-  const data = await marketplaceGraphqlRequest<FindManyMarketplaceAppsData>(
-    FIND_MANY_MARKETPLACE_APPS_QUERY,
-  );
+// not read as an empty catalog, or every app page turns into a 404. Cached per
+// request: an app page, its metadata and its detail all read the catalogue.
+export const fetchMarketplaceApps = cache(
+  async (): Promise<readonly MarketplaceApp[]> => {
+    const data = await marketplaceGraphqlRequest<FindManyMarketplaceAppsData>(
+      FIND_MANY_MARKETPLACE_APPS_QUERY,
+    );
 
-  if (!Array.isArray(data.publicMarketplaceApps)) {
-    throw new Error('marketplace API response missing apps array');
-  }
+    if (!Array.isArray(data.publicMarketplaceApps)) {
+      throw new Error('marketplace API response missing apps array');
+    }
 
-  return data.publicMarketplaceApps.map(normalizeApp);
-}
+    return data.publicMarketplaceApps.map(normalizeApp);
+  },
+);

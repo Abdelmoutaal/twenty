@@ -75,7 +75,7 @@ export default async function AppDetailPage({
 
     return (
       <>
-        <Menu communityStats={communityStats} scheme="dark" />
+        <Menu communityStats={communityStats} scheme="muted" />
         <main>
           <AppsHero apps={[]} />
           <AppsCatalogue apps={[]} isUnavailable />
@@ -102,7 +102,7 @@ export default async function AppDetailPage({
       />
       <Menu communityStats={communityStats} scheme="light" />
       <main>
-        <AppDetail app={app} apps={apps} locale={locale} />
+        <AppDetail app={app} apps={apps} />
       </main>
     </>
   );

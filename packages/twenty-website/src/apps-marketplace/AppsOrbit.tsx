@@ -1,7 +1,7 @@
 'use client';
 
 import { styled } from '@linaria/react';
-import { type CSSProperties, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { isDefined, isNonEmptyString } from 'twenty-shared/utils';
 
 import { getReducedMotionSnapshot } from '@/platform/motion';
@@ -17,6 +17,8 @@ import {
   semanticColor,
   spacing,
 } from '@/tokens';
+
+import { cssVariableStyle } from '@/ui/css-variable-style';
 
 import { APPS_ORBIT_ROOM } from './apps-orbit-room';
 import { type MarketplaceApp } from './marketplace-app';
@@ -178,12 +180,6 @@ const FADE_END_DEGREES = 34;
 const getAngleFromTop = (angle: number) =>
   ((((angle + 180) % 360) + 360) % 360) - 180;
 
-type StageStyle = CSSProperties & {
-  '--apps-stage-orbit-angle': string;
-  '--apps-stage-orbit-opacity': number;
-  '--apps-stage-orbit-tint': string;
-};
-
 type AppsOrbitProps = {
   apps: readonly MarketplaceApp[];
 };
@@ -300,7 +296,10 @@ export function AppsOrbit({ apps }: AppsOrbitProps) {
       }
 
       draw();
-      frame = isVisible ? requestAnimationFrame(tick) : 0;
+      // Reduced motion: the ring only moves while dragged or thrown.
+      const isMoving =
+        !isReducedMotion || isDragging || Math.abs(throwVelocity) > 0.01;
+      frame = isVisible && isMoving ? requestAnimationFrame(tick) : 0;
     };
 
     const start = () => {
@@ -402,13 +401,13 @@ export function AppsOrbit({ apps }: AppsOrbitProps) {
           {Array.from({ length: SLOT_COUNT }, (_, slot) => {
             const app = appsWithLogo[slot % appsWithLogo.length];
             const tint = inks[app.slug]?.tint ?? '';
-            const style: StageStyle = {
+            const style = cssVariableStyle({
               '--apps-stage-orbit-angle': `${(360 / SLOT_COUNT) * slot}deg`,
               '--apps-stage-orbit-opacity':
                 SLOT_OPACITIES[slot % SLOT_OPACITIES.length],
               '--apps-stage-orbit-tint':
                 tint.length > 0 ? tint : 'currentColor',
-            };
+            });
 
             return (
               <Label key={`${slot}-${app.slug}`} style={style}>

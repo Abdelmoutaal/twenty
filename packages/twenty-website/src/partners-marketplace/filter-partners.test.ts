@@ -1,6 +1,5 @@
 import { EMPTY_FILTER_CRITERIA, type FilterCriteria } from './filter-criteria';
 import { filterPartners } from './filter-partners';
-import { hasAnyFilter } from './has-any-filter';
 import { type MarketplacePartner } from './marketplace-partner';
 
 const partner = (
@@ -74,20 +73,5 @@ describe('filterPartners', () => {
       regions: new Set(['EUROPE', 'US']),
     };
     expect(filterPartners(partners, criteria)).toEqual(partners);
-  });
-});
-
-describe('hasAnyFilter', () => {
-  it('is false for empty criteria', () => {
-    expect(hasAnyFilter(EMPTY_FILTER_CRITERIA)).toBe(false);
-  });
-
-  it('is true once a facet has a selection', () => {
-    expect(
-      hasAnyFilter({
-        ...EMPTY_FILTER_CRITERIA,
-        categories: new Set(['HOSTING']),
-      }),
-    ).toBe(true);
   });
 });

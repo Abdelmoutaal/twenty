@@ -162,7 +162,7 @@ export function FilterBar({
         <Count aria-live="polite">{resultCount}</Count>
       </TopRow>
       {activeValues.length > 0 && (
-        <Pills aria-label={i18n._(msg`Active filters`)}>
+        <Pills aria-label={i18n._(msg`Active filters`)} role="group">
           {activeValues.map(({ facetKey, option }) => (
             <Pill key={`${facetKey}:${option.value}`}>
               {option.label}

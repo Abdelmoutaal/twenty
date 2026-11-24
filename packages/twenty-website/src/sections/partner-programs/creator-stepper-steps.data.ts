@@ -11,24 +11,28 @@ export const CREATOR_STEPPER_STEPS = [
     icon: 'edit' as const,
     heading: msg`Apply`,
     body: msg`We review every application within 5 business days and send your link once you're approved.`,
+    scrubbed: true,
     Visual: CreatorApplyStepVisual,
   },
   {
     icon: 'tag' as const,
     heading: msg`Share your link`,
     body: msg`Signups within 30 days of a click on your link are yours.`,
+    scrubbed: true,
     Visual: CreatorLinkStepVisual,
   },
   {
     icon: 'users' as const,
     heading: msg`Earn 20% for 12 months`,
     body: msg`Of seat revenue on Cloud Organization and Enterprise plans, per customer, counted from their first payment.`,
+    scrubbed: true,
     Visual: CommissionStepVisual,
   },
   {
     icon: 'check' as const,
     heading: msg`Get paid monthly`,
     body: msg`From $50, after a 30-day hold.`,
+    scrubbed: true,
     Visual: CreatorPayoutStepVisual,
   },
 ];
