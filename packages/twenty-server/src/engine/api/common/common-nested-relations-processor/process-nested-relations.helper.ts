@@ -33,6 +33,8 @@ import { ProcessAggregateHelper } from 'src/engine/api/common/utils/process-aggr
 import { buildColumnsToSelect } from 'src/engine/api/common/utils/build-columns-to-select';
 import { getTargetObjectMetadataOrThrow } from 'src/engine/api/common/utils/get-target-object-metadata.util';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
+import { type ChannelAssociationSourceLoader } from 'src/engine/metadata-modules/connected-account/channel-association-source/types/channel-association-source-loader.type';
+import { ChannelAssociationSourceService } from 'src/engine/metadata-modules/connected-account/channel-association-source/services/channel-association-source.service';
 import { FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
@@ -64,7 +66,10 @@ type ProcessNestedRelationsArgs<T extends ObjectRecord = ObjectRecord> = {
 
 @Injectable()
 export class ProcessNestedRelationsHelper {
-  constructor(private readonly workspaceOrmManager: WorkspaceOrmManager) {}
+  constructor(
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly channelAssociationSourceService: ChannelAssociationSourceService,
+  ) {}
 
   public async processNestedRelations<T extends ObjectRecord = ObjectRecord>(
     args: ProcessNestedRelationsArgs<T>,
@@ -72,6 +77,9 @@ export class ProcessNestedRelationsHelper {
     return await this.processNestedRelationsWithLimiter(
       args,
       createConcurrencyLimiter(NESTED_RELATION_QUERY_MAX_CONCURRENCY),
+      this.channelAssociationSourceService.createSourceLoader(
+        args.authContext.workspace.id,
+      ),
     );
   }
 
@@ -90,7 +98,14 @@ export class ProcessNestedRelationsHelper {
       repository,
     }: ProcessNestedRelationsArgs<T>,
     relationQueryLimiter: ConcurrencyLimiter,
+    loadChannelAssociationSources: ChannelAssociationSourceLoader,
   ): Promise<CommonRelationsAggregatedValues> {
+    await this.channelAssociationSourceService.assignSourcesToRecords({
+      loadSources: loadChannelAssociationSources,
+      flatObjectMetadata: parentObjectMetadataItem,
+      records: parentObjectRecords,
+    });
+
     const processRelationTasks = getRelationSelectionEntries(selection).map(
       async ({ key, relationSelection }) =>
         [
@@ -107,6 +122,7 @@ export class ProcessNestedRelationsHelper {
             useReplica,
             repository,
             relationQueryLimiter,
+            loadChannelAssociationSources,
           }),
         ] as const,
     );
@@ -126,6 +142,7 @@ export class ProcessNestedRelationsHelper {
     useReplica,
     repository,
     relationQueryLimiter,
+    loadChannelAssociationSources,
   }: {
     flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
     flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
@@ -138,6 +155,7 @@ export class ProcessNestedRelationsHelper {
     useReplica: boolean;
     repository?: WorkspaceRepository;
     relationQueryLimiter: ConcurrencyLimiter;
+    loadChannelAssociationSources: ChannelAssociationSourceLoader;
   }): Promise<CommonRelationAggregatedValues> {
     const emptyAggregatedValues: CommonRelationAggregatedValues = {
       valuesByParentRecordId: {},
@@ -310,6 +328,7 @@ export class ProcessNestedRelationsHelper {
           repository,
         },
         relationQueryLimiter,
+        loadChannelAssociationSources,
       );
 
     // After the nested load: a to-one relation is assigned as a copy, so nested rows must already be on it

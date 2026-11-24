@@ -23,6 +23,7 @@ import { ViewFilterModule } from 'src/engine/metadata-modules/view-filter/view-f
 import { ViewModule } from 'src/engine/metadata-modules/view/view.module';
 import { PermissionsModule } from 'src/engine/permissions/permissions.module';
 import { RecordShareModule } from 'src/engine/permissions/record-share/record-share.module';
+import { ChannelAssociationSourceModule } from 'src/engine/metadata-modules/connected-account/channel-association-source/channel-association-source.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 
 @Module({
@@ -42,6 +43,7 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     RecordShareModule,
     RecordTransformerModule,
     WorkspaceCacheModule,
+    ChannelAssociationSourceModule,
   ],
   providers: [
     CommonSelectFieldsBuilder,
