@@ -1,4 +1,3 @@
-import { aiChatTestInstanceThreadIdState } from '@/ai-chat/testing/aiChatTestInstanceThreadIdState';
 import { AiChatTestInstance } from '@/ai-chat/testing/AiChatTestInstance';
 import { type CombinedGraphQLErrors } from '@apollo/client/errors';
 import { renderHook } from '@testing-library/react';
@@ -6,7 +5,7 @@ import { Provider as JotaiProvider } from 'jotai';
 import { type ReactNode } from 'react';
 
 import { useHasReachedAiChatCreditsCap } from '@/ai-chat/usage/hooks/useHasReachedAiChatCreditsCap';
-import { aiChatErrorFamilyState } from '@/ai-chat/states/aiChatErrorFamilyState';
+import { aiChatThreadReplyErrorFamilyState } from '@/ai-chat/states/reply/aiChatThreadReplyErrorFamilyState';
 import { AiChatErrorCode } from '@/ai-chat/utils/aiChatErrorCode';
 import { createAiChatCodedError } from '@/ai-chat/utils/createAiChatCodedError';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
@@ -20,13 +19,13 @@ const THREAD_ID = 'thread-1';
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
   <JotaiProvider store={jotaiStore}>
-    <AiChatTestInstance>{children}</AiChatTestInstance>
+    <AiChatTestInstance threadId={THREAD_ID}>{children}</AiChatTestInstance>
   </JotaiProvider>
 );
 
 const setThreadError = (error: Error | CombinedGraphQLErrors) => {
   jotaiStore.set(
-    aiChatErrorFamilyState.atomFamily({ threadId: THREAD_ID }),
+    aiChatThreadReplyErrorFamilyState.atomFamily({ threadId: THREAD_ID }),
     error,
   );
 };
@@ -66,7 +65,6 @@ const renderHasReachedAiChatCreditsCap = () =>
 describe('useHasReachedAiChatCreditsCap', () => {
   beforeEach(() => {
     resetJotaiStore();
-    jotaiStore.set(aiChatTestInstanceThreadIdState.atom, THREAD_ID);
   });
 
   it('should return false when the workspace has credits left and the thread has no error', () => {

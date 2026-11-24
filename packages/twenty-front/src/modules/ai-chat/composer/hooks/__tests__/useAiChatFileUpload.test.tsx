@@ -6,8 +6,7 @@ import { type ReactNode } from 'react';
 import { AgentChatThreadConversationType } from 'twenty-shared/ai';
 
 import { useAiChatFileUpload } from '@/ai-chat/composer/hooks/useAiChatFileUpload';
-import { aiChatSelectedFilesFamilyState } from '@/ai-chat/composer/states/aiChatSelectedFilesFamilyState';
-import { aiChatTestInstanceThreadIdState } from '@/ai-chat/testing/aiChatTestInstanceThreadIdState';
+import { aiChatComposerUploadingFilesFamilyState } from '@/ai-chat/composer/states/aiChatComposerUploadingFilesFamilyState';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { AppToaster } from '@/ui/feedback/toast/components/AppToaster';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
@@ -55,9 +54,6 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
 
 describe('useAiChatFileUpload', () => {
   it('uploads after leaving a DM and aborts files removed from the selection', async () => {
-    const previousThreadId = jotaiStore.get(
-      aiChatTestInstanceThreadIdState.atom,
-    );
     const directMessageAtom = recordStoreFamilyState.atomFamily(
       DIRECT_MESSAGE_THREAD_ID,
     );
@@ -67,10 +63,6 @@ describe('useAiChatFileUpload', () => {
       __typename: 'AgentChatThread',
       conversationType: AgentChatThreadConversationType.DIRECT_MESSAGE,
     });
-    jotaiStore.set(
-      aiChatTestInstanceThreadIdState.atom,
-      DIRECT_MESSAGE_THREAD_ID,
-    );
     const { result } = renderHook(() => useAiChatFileUpload(), {
       wrapper: Wrapper,
     });
@@ -82,7 +74,6 @@ describe('useAiChatFileUpload', () => {
 
     try {
       act(() => {
-        jotaiStore.set(aiChatTestInstanceThreadIdState.atom, NEW_THREAD_ID);
         upload = result.current.uploadFiles({
           files: [file],
           threadId: NEW_THREAD_ID,
@@ -93,7 +84,7 @@ describe('useAiChatFileUpload', () => {
 
       await act(async () => {
         jotaiStore.set(
-          aiChatSelectedFilesFamilyState.atomFamily({
+          aiChatComposerUploadingFilesFamilyState.atomFamily({
             threadId: NEW_THREAD_ID,
           }),
           [],
@@ -104,8 +95,43 @@ describe('useAiChatFileUpload', () => {
       expect(putFile.mock.calls[0][1]?.signal?.aborted).toBe(true);
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
     } finally {
-      jotaiStore.set(aiChatTestInstanceThreadIdState.atom, previousThreadId);
       jotaiStore.set(directMessageAtom, previousDirectMessage);
     }
+  });
+
+  it('refuses a file over the size limit with a message and does not upload it', async () => {
+    putFile.mockClear();
+    const { result } = renderHook(() => useAiChatFileUpload(), {
+      wrapper: Wrapper,
+    });
+    const oversizedFile = new File(['big'], 'big.pdf');
+    Object.defineProperty(oversizedFile, 'size', {
+      value: 51 * 1024 * 1024,
+    });
+
+    let uploadedFiles: Awaited<ReturnType<typeof result.current.uploadFiles>> =
+      [];
+
+    await act(async () => {
+      uploadedFiles = await result.current.uploadFiles({
+        files: [oversizedFile],
+        threadId: NEW_THREAD_ID,
+      });
+    });
+
+    expect(uploadedFiles).toEqual([]);
+    expect(putFile).not.toHaveBeenCalled();
+    expect(
+      await screen.findByText(
+        'Couldn\'t attach "big.pdf". Files must be 50.0 MB or smaller.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      jotaiStore.get(
+        aiChatComposerUploadingFilesFamilyState.atomFamily({
+          threadId: NEW_THREAD_ID,
+        }),
+      ),
+    ).toEqual([]);
   });
 });

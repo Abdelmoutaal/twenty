@@ -10,18 +10,21 @@ export const INTEGRATOR_STEPPER_STEPS = [
     icon: 'edit' as const,
     heading: msg`Apply`,
     body: msg`Tell us about your company, the clients you work with and what you have built with Twenty. It takes a few minutes.`,
+    scrubbed: true,
     Visual: ApplyStepVisual,
   },
   {
     icon: 'tag' as const,
     heading: msg`Get your partner code`,
     body: msg`We review every application by hand, then send you your partner code.`,
+    scrubbed: true,
     Visual: PartnerCodeStepVisual,
   },
   {
     icon: 'users' as const,
     heading: msg`Bring your clients`,
     body: msg`Earn 20% of seat revenue for 12 months on every client on Organization or Enterprise.`,
+    scrubbed: true,
     Visual: CommissionStepVisual,
   },
 ];

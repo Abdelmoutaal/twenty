@@ -3,7 +3,6 @@
 import { styled } from '@linaria/react';
 import { DURATION } from '@/tokens';
 import { useState } from 'react';
-import { isDefined } from 'twenty-shared/utils';
 
 import { HalftoneImageBackdrop } from '@/platform/visuals/rigs/HalftoneImageBackdrop';
 
@@ -22,23 +21,8 @@ const BackdropMount = styled.div<{ $isReady: boolean }>`
   width: calc(100% + 80px);
 `;
 
-// Another light source keeps the bridge's settings, framed at the hero's foot.
-const BOTTOM_FRAME = {
-  previewDistance: 3.2,
-  verticalAnchor: 0,
-  verticalOffsetPx: 0,
-  horizontalOffsetPx: 0,
-};
-
-type HeroBackdropProps = {
-  imageUrl?: string;
-};
-
-export function HeroBackdrop({ imageUrl }: HeroBackdropProps) {
+export function HeroBackdrop() {
   const [isReady, setIsReady] = useState(false);
-  const settings = isDefined(imageUrl)
-    ? { ...HERO_BACKDROP.settings, responsiveFrame: () => BOTTOM_FRAME }
-    : HERO_BACKDROP.settings;
 
   return (
     <BackdropMount
@@ -47,11 +31,11 @@ export function HeroBackdrop({ imageUrl }: HeroBackdropProps) {
       data-illustration="hero-bridge"
     >
       <HalftoneImageBackdrop
-        imageUrl={imageUrl ?? HERO_BACKDROP.imageUrl}
+        imageUrl={HERO_BACKDROP.imageUrl}
         loading="eager"
         onFirstFrame={() => setIsReady(true)}
         priority
-        settings={settings}
+        settings={HERO_BACKDROP.settings}
       />
     </BackdropMount>
   );

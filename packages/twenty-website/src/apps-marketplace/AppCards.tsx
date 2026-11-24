@@ -64,7 +64,7 @@ const Card = styled(LocalizedLink)`
   ${REDUCED_MOTION} {
     transition: none;
 
-    &:hover {
+    &:is(:hover, :focus-visible) {
       transform: none;
     }
   }

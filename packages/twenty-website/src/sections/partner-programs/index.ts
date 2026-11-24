@@ -1,7 +1,9 @@
-export { CREATOR_HERO_MODEL } from './creator-hero-model';
+export { CreatorHeroRoom } from './CreatorHeroRoom';
+export { CreatorHeroScene } from './CreatorHeroScene';
 export { CREATOR_STEPPER_STEPS } from './creator-stepper-steps.data';
 export { CreatorApplyButton } from './CreatorApplyButton';
 export { CreatorAudiences } from './CreatorAudiences';
+export { INTEGRATOR_HERO_BACKDROP } from './integrator-hero-backdrop';
 export { INTEGRATOR_STEPPER_STEPS } from './integrator-stepper-steps.data';
 export { IntegratorApplyButton } from './IntegratorApplyButton';
 export { IntegratorEarnings } from './IntegratorEarnings';

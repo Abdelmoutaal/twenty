@@ -10,7 +10,6 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { AiChatEditorSection } from '@/ai-chat/composer/components/AiChatEditorSection';
 import { AiChatTestInstance } from '@/ai-chat/testing/AiChatTestInstance';
-import { aiChatTestInstanceThreadIdState } from '@/ai-chat/testing/aiChatTestInstanceThreadIdState';
 import { newAiChatThreadIdState } from '@/ai-chat/states/newAiChatThreadIdState';
 import { getJestMetadataAndApolloMocksWrapper } from '~/testing/jest/getJestMetadataAndApolloMocksWrapper';
 import { getTestEnrichedObjectMetadataItemsMock } from '~/testing/utils/getTestEnrichedObjectMetadataItemsMock';
@@ -21,11 +20,10 @@ const useAiChatEditor = jest.fn();
 jest.mock('@/ai-chat/composer/hooks/useAiChatEditor', () => ({
   useAiChatEditor: () => useAiChatEditor(),
 }));
-jest.mock('@/ai-chat/usage/hooks/useHasReachedAiChatUsageLimit', () => ({
-  useHasReachedAiChatUsageLimit: () => false,
-}));
-jest.mock('@/ai-chat/composer/components/AiChatStandaloneError', () => ({
-  AiChatStandaloneError: () => null,
+jest.mock('@/ai-chat/composer/hooks/useSendAiChatComposerMessage', () => ({
+  useSendAiChatComposerMessage: () => ({
+    sendAiChatComposerMessage: jest.fn(),
+  }),
 }));
 jest.mock('@/ai-chat/tool-calls/components/AiChatPendingAskGate', () => ({
   AiChatPendingAskGate: ({ children }: { children: ReactNode }) => children,
@@ -33,19 +31,18 @@ jest.mock('@/ai-chat/tool-calls/components/AiChatPendingAskGate', () => ({
 
 const objectMetadataItems = getTestEnrichedObjectMetadataItemsMock();
 
-const renderEditorSection = (currentAiChatThread: string) => {
+const renderEditorSection = (threadId: string) => {
   const MetadataAndApolloWrapper = getJestMetadataAndApolloMocksWrapper({
     objectMetadataItems,
     onInitializeJotaiStore: (store) => {
       store.set(newAiChatThreadIdState.atom, NEW_CHAT_THREAD_ID);
-      store.set(aiChatTestInstanceThreadIdState.atom, currentAiChatThread);
     },
   });
 
   return render(
     <MetadataAndApolloWrapper>
       <I18nProvider i18n={i18n}>
-        <AiChatTestInstance>
+        <AiChatTestInstance threadId={threadId}>
           <MemoryRouter>
             <AiChatEditorSection />
           </MemoryRouter>

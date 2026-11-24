@@ -12,8 +12,7 @@ import { StandardObjectNameSingular } from 'twenty-shared/types';
 
 import { serializeAdvancedTextEditorDocument } from '@/advanced-text-editor/utils/serializeAdvancedTextEditorDocument';
 import { AiChatParticipantMentionBar } from '@/ai-chat/composer/components/AiChatParticipantMentionBar';
-import { aiChatDraftsByThreadIdState } from '@/ai-chat/states/aiChatDraftsByThreadIdState';
-import { aiChatTestInstanceThreadIdState } from '@/ai-chat/testing/aiChatTestInstanceThreadIdState';
+import { aiChatComposerDraftsState } from '@/ai-chat/states/composer/aiChatComposerDraftsState';
 import { MentionTag } from '@/mention/extensions/MentionTag';
 import { getMentionTagContent } from '@/mention/utils/getMentionTagContent';
 import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
@@ -28,16 +27,12 @@ const GRACE_ID = '20202020-0000-4000-8000-000000000021';
 const THREAD_ID = '20202020-0000-4000-8000-0000000000aa';
 
 const renderBar = (editor: Editor) => {
-  const Wrapper = getJestMetadataAndApolloMocksWrapper({
-    onInitializeJotaiStore: (store) => {
-      store.set(aiChatTestInstanceThreadIdState.atom, THREAD_ID);
-    },
-  });
+  const Wrapper = getJestMetadataAndApolloMocksWrapper({});
 
   return render(
     <Wrapper>
       <I18nProvider i18n={i18n}>
-        <AiChatTestInstance>
+        <AiChatTestInstance threadId={THREAD_ID}>
           <AiChatParticipantMentionBar editor={editor as ReactEditor} />
         </AiChatTestInstance>
       </I18nProvider>
@@ -52,7 +47,7 @@ describe('AiChatParticipantMentionBar', () => {
     editor = new Editor({
       extensions: [Document, Paragraph, Text, MentionTag],
       onUpdate: ({ editor: updatedEditor }) => {
-        jotaiStore.set(aiChatDraftsByThreadIdState.atom, {
+        jotaiStore.set(aiChatComposerDraftsState.atom, {
           [THREAD_ID]: serializeAdvancedTextEditorDocument(updatedEditor),
         });
       },
