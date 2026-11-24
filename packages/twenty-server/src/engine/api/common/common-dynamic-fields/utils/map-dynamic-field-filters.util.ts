@@ -3,9 +3,9 @@ import { isDefined, isPlainObject } from 'twenty-shared/utils';
 
 import { type ObjectRecordFilter } from 'src/engine/api/graphql/workspace-query-builder/interfaces/object-record.interface';
 
-import { CHANNEL_ASSOCIATION_CONFIG_BY_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/engine/metadata-modules/connected-account/channel-association-source/constants/channel-association-config-by-object-universal-identifier.constant';
-import { CHANNEL_ASSOCIATION_SOURCE_FIELD_NAMES } from 'src/engine/metadata-modules/connected-account/channel-association-source/constants/channel-association-source-field-names.constant';
-import { type ChannelAssociationSourceFilter } from 'src/engine/metadata-modules/connected-account/channel-association-source/types/channel-association-source-filter.type';
+import { type DynamicFieldFilter } from 'src/engine/api/common/common-dynamic-fields/types/dynamic-field-filter.type';
+import { type DynamicFieldResolverInstance } from 'src/engine/api/common/common-dynamic-fields/types/dynamic-field-resolver-instance.type';
+import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
@@ -13,13 +13,16 @@ import { buildFieldMapsFromFlatObjectMetadata } from 'src/engine/metadata-module
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 
-type MapChannelAssociationSourceFiltersArgs = {
+type MapDynamicFieldFiltersArgs = {
   filter: ObjectRecordFilter;
   flatObjectMetadata: FlatObjectMetadata;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
-  mapSourceFilter: (
-    sourceFilter: ChannelAssociationSourceFilter,
+  findDynamicFieldResolver: (
+    objectUniversalIdentifier: string,
+  ) => DynamicFieldResolverInstance | undefined;
+  mapDynamicFieldFilter: (
+    dynamicFieldFilter: DynamicFieldFilter,
   ) => ObjectRecordFilter | undefined;
 };
 
@@ -29,7 +32,7 @@ const findRelationTargetFlatObjectMetadata = ({
   flatObjectMetadataMaps,
   flatFieldMetadataMaps,
 }: Pick<
-  MapChannelAssociationSourceFiltersArgs,
+  MapDynamicFieldFiltersArgs,
   'flatObjectMetadata' | 'flatObjectMetadataMaps' | 'flatFieldMetadataMaps'
 > & { fieldName: string }): FlatObjectMetadata | undefined => {
   const { fieldIdByName, fieldIdByJoinColumnName } =
@@ -65,36 +68,32 @@ const findRelationTargetFlatObjectMetadata = ({
   });
 };
 
-const isChannelAssociationSourceFieldName = (
-  key: string,
-): key is ChannelAssociationSourceFilter['fieldName'] =>
-  Object.keys(CHANNEL_ASSOCIATION_SOURCE_FIELD_NAMES).includes(key);
-
-export const mapChannelAssociationSourceFilters = ({
+export const mapDynamicFieldFilters = ({
   filter,
   flatObjectMetadata,
   flatObjectMetadataMaps,
   flatFieldMetadataMaps,
-  mapSourceFilter,
-}: MapChannelAssociationSourceFiltersArgs): ObjectRecordFilter => {
-  const channelAssociationConfig =
-    CHANNEL_ASSOCIATION_CONFIG_BY_OBJECT_UNIVERSAL_IDENTIFIER[
-      flatObjectMetadata.universalIdentifier
-    ];
+  findDynamicFieldResolver,
+  mapDynamicFieldFilter,
+}: MapDynamicFieldFiltersArgs): ObjectRecordFilter => {
+  const dynamicFieldResolver = findDynamicFieldResolver(
+    flatObjectMetadata.universalIdentifier,
+  );
   const mapNestedFilter = (
     nestedFilter: ObjectRecordFilter,
     nestedFlatObjectMetadata: FlatObjectMetadata = flatObjectMetadata,
   ) =>
-    mapChannelAssociationSourceFilters({
+    mapDynamicFieldFilters({
       filter: nestedFilter,
       flatObjectMetadata: nestedFlatObjectMetadata,
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
-      mapSourceFilter,
+      findDynamicFieldResolver,
+      mapDynamicFieldFilter,
     });
 
   const untouchedFilter: ObjectRecordFilter = {};
-  const mappedSourceFilters: ObjectRecordFilter[] = [];
+  const mappedDynamicFieldFilters: ObjectRecordFilter[] = [];
 
   for (const [key, value] of Object.entries(filter)) {
     if ((key === 'and' || key === 'or') && Array.isArray(value)) {
@@ -109,29 +108,32 @@ export const mapChannelAssociationSourceFilters = ({
       continue;
     }
 
-    const relationTargetFlatObjectMetadata = isPlainObject(value)
-      ? findRelationTargetFlatObjectMetadata({
-          fieldName: key,
-          flatObjectMetadata,
-          flatObjectMetadataMaps,
-          flatFieldMetadataMaps,
-        })
-      : undefined;
+    if (!isPlainObject(value)) {
+      untouchedFilter[key] = value;
+      continue;
+    }
 
-    if (
-      isDefined(channelAssociationConfig) &&
-      isChannelAssociationSourceFieldName(key) &&
-      isPlainObject(value)
-    ) {
-      const mappedSourceFilter = mapSourceFilter({
-        channelAssociationConfig,
+    const relationTargetFlatObjectMetadata =
+      findRelationTargetFlatObjectMetadata({
         fieldName: key,
-        fieldFilter: value,
-        accountOwnerFlatObjectMetadata: relationTargetFlatObjectMetadata,
+        flatObjectMetadata,
+        flatObjectMetadataMaps,
+        flatFieldMetadataMaps,
+      });
+    const dynamicFieldName = isDefined(relationTargetFlatObjectMetadata)
+      ? computeMorphOrRelationFieldJoinColumnName({ name: key })
+      : key;
+
+    if (dynamicFieldResolver?.dynamicFieldNames.includes(dynamicFieldName)) {
+      const mappedDynamicFieldFilter = mapDynamicFieldFilter({
+        dynamicFieldResolver,
+        dynamicFieldName,
+        dynamicFieldFilter: value,
+        relationTargetFlatObjectMetadata,
       });
 
-      if (isDefined(mappedSourceFilter)) {
-        mappedSourceFilters.push(mappedSourceFilter);
+      if (isDefined(mappedDynamicFieldFilter)) {
+        mappedDynamicFieldFilters.push(mappedDynamicFieldFilter);
         continue;
       }
     }
@@ -141,14 +143,14 @@ export const mapChannelAssociationSourceFilters = ({
       : value;
   }
 
-  if (mappedSourceFilters.length === 0) {
+  if (mappedDynamicFieldFilters.length === 0) {
     return untouchedFilter;
   }
 
   return {
     and: [
       ...(Object.keys(untouchedFilter).length > 0 ? [untouchedFilter] : []),
-      ...mappedSourceFilters,
+      ...mappedDynamicFieldFilters,
     ],
   };
 };

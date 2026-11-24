@@ -363,7 +363,7 @@ export class CommonGroupByQueryRunnerService extends CommonBaseQueryRunnerServic
         workspaceId: authContext.workspace.id,
       });
       appliedFilters =
-        await this.channelAssociationSourceService.rewriteSourceFilter({
+        await this.dynamicFieldService.rewriteDynamicFieldFilters({
           authContext,
           filter: appliedFilters,
           flatObjectMetadata,

@@ -5,8 +5,6 @@ import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-m
 import { type CommonSelection } from 'src/engine/api/common/types/common-selection.type';
 import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfaces/relation-type.interface';
 
-import { CHANNEL_ASSOCIATION_CONFIG_BY_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/engine/metadata-modules/connected-account/channel-association-source/constants/channel-association-config-by-object-universal-identifier.constant';
-import { CHANNEL_ASSOCIATION_SOURCE_COLUMN_NAMES } from 'src/engine/metadata-modules/connected-account/channel-association-source/constants/channel-association-source-column-names.constant';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -34,20 +32,6 @@ export const buildColumnsToSelect = ({
     flatFieldMetadataMaps,
   })) {
     fieldsToSelect[columnName] = true;
-  }
-
-  const channelAssociationConfig =
-    CHANNEL_ASSOCIATION_CONFIG_BY_OBJECT_UNIVERSAL_IDENTIFIER[
-      flatObjectMetadata.universalIdentifier
-    ];
-
-  if (
-    isDefined(channelAssociationConfig) &&
-    CHANNEL_ASSOCIATION_SOURCE_COLUMN_NAMES.some(
-      (columnName) => fieldsToSelect[columnName] === true,
-    )
-  ) {
-    fieldsToSelect[channelAssociationConfig.channelIdColumnName] = true;
   }
 
   return { ...fieldsToSelect, id: true };
